@@ -1,0 +1,112 @@
+#pragma kernel Pixelizer2
+#pragma kernel Pixelizer3
+#pragma kernel Pixelizer4
+#pragma kernel Pixelizer5
+
+RWTexture2D<float4> _Result;
+int _TextureWidth;
+int _TextureHeight;
+int _PixelSize;
+
+uint2 GetLocalizedCoords(uint2 id)
+{
+    uint localizedCoordsX = id.x - id.x % _PixelSize;
+    uint localizedCoordsY = id.y - id.y % _PixelSize;
+    return uint2(localizedCoordsX , localizedCoordsY);
+}
+
+[numthreads(32,32,1)]
+void Pixelizer2 (uint2 id : SV_DispatchThreadID)
+{
+    float4 colors[4];
+    colors[0] = _Result[GetLocalizedCoords(id)];
+    colors[1] = _Result[GetLocalizedCoords(id) + uint2(1, 0)];
+    colors[2] = _Result[GetLocalizedCoords(id) + uint2(0, 1)];
+    colors[3] = _Result[GetLocalizedCoords(id) + uint2(1, 1)];
+
+    float4 finalColor = (colors[0] + colors[1] + colors[2] + colors[3]) / 4;
+    _Result[id] = finalColor;
+}
+
+[numthreads(32,32,1)]
+void Pixelizer3 (uint2 id : SV_DispatchThreadID)
+{
+    float4 colors[9];
+    colors[0] = _Result[GetLocalizedCoords(id) + uint2(0, 0)];
+    colors[1] = _Result[GetLocalizedCoords(id) + uint2(1, 0)];
+    colors[2] = _Result[GetLocalizedCoords(id) + uint2(2, 0)];
+    colors[3] = _Result[GetLocalizedCoords(id) + uint2(1, 1)];
+    colors[4] = _Result[GetLocalizedCoords(id) + uint2(1, 2)];
+    colors[5] = _Result[GetLocalizedCoords(id) + uint2(0, 1)];
+    colors[6] = _Result[GetLocalizedCoords(id) + uint2(0, 2)];
+    colors[7] = _Result[GetLocalizedCoords(id) + uint2(2, 1)];
+    colors[8] = _Result[GetLocalizedCoords(id) + uint2(2, 2)];
+
+    float4 finalColor = (colors[0] + colors[1] + colors[2] + colors[3] + colors[4] + colors[5] + colors[6] + colors[7] + colors[8]) / 9;
+    _Result[id] = finalColor;
+}
+
+[numthreads(32,32,1)]
+void Pixelizer4 (uint2 id : SV_DispatchThreadID)
+{
+    float4 colors[16];
+    colors[0] = _Result[GetLocalizedCoords(id)];
+    colors[1] = _Result[GetLocalizedCoords(id) + uint2(1, 0)];
+    colors[2] = _Result[GetLocalizedCoords(id) + uint2(2, 0)];
+    colors[3] = _Result[GetLocalizedCoords(id) + uint2(3, 0)];
+    colors[4] = _Result[GetLocalizedCoords(id) + uint2(0, 1)];
+    colors[5] = _Result[GetLocalizedCoords(id) + uint2(0, 2)];
+    colors[6] = _Result[GetLocalizedCoords(id) + uint2(0, 3)];
+    colors[7] = _Result[GetLocalizedCoords(id) + uint2(1, 1)];
+    colors[8] = _Result[GetLocalizedCoords(id) + uint2(2, 2)];
+    colors[9] = _Result[GetLocalizedCoords(id) + uint2(3, 3)];
+    colors[10] = _Result[GetLocalizedCoords(id) + uint2(2, 1)];
+    colors[11] = _Result[GetLocalizedCoords(id) + uint2(2, 2)];
+    colors[12] = _Result[GetLocalizedCoords(id) + uint2(2, 3)];
+    colors[13] = _Result[GetLocalizedCoords(id) + uint2(3, 1)];
+    colors[14] = _Result[GetLocalizedCoords(id) + uint2(3, 2)];
+    colors[15] = _Result[GetLocalizedCoords(id) + uint2(3, 3)];
+
+    float4 finalColor = (colors[0] + colors[1] + colors[2] + colors[3] + colors[4] + colors[5] + colors[6] + colors[7] + colors[8] +
+        colors[9] + colors[10] + colors[11] + colors[12] + colors[13] + colors[14] + colors[15]) / 16;
+    _Result[id] = finalColor;
+}
+
+[numthreads(32,32,1)]
+void Pixelizer5 (uint2 id : SV_DispatchThreadID)
+{
+    float4 colors[25];
+    colors[0] = _Result[GetLocalizedCoords(id)];
+    colors[1] = _Result[GetLocalizedCoords(id) + uint2(1, 0)];
+    colors[2] = _Result[GetLocalizedCoords(id) + uint2(2, 0)];
+    colors[3] = _Result[GetLocalizedCoords(id) + uint2(3, 0)];
+    colors[4] = _Result[GetLocalizedCoords(id) + uint2(4, 0)];
+    colors[5] = _Result[GetLocalizedCoords(id) + uint2(0, 1)];
+    colors[6] = _Result[GetLocalizedCoords(id) + uint2(0, 2)];
+    colors[7] = _Result[GetLocalizedCoords(id) + uint2(0, 3)];
+    colors[8] = _Result[GetLocalizedCoords(id) + uint2(0, 4)];
+    colors[9] = _Result[GetLocalizedCoords(id) + uint2(1, 1)];
+    colors[10] = _Result[GetLocalizedCoords(id) + uint2(1, 2)];
+    colors[11] = _Result[GetLocalizedCoords(id) + uint2(1, 3)];
+    colors[12] = _Result[GetLocalizedCoords(id) + uint2(1, 4)];
+    colors[13] = _Result[GetLocalizedCoords(id) + uint2(2, 1)];
+    colors[14] = _Result[GetLocalizedCoords(id) + uint2(2, 2)];
+    colors[15] = _Result[GetLocalizedCoords(id) + uint2(2, 3)];
+    colors[16] = _Result[GetLocalizedCoords(id) + uint2(2, 4)];
+    colors[17] = _Result[GetLocalizedCoords(id) + uint2(3, 1)];
+    colors[18] = _Result[GetLocalizedCoords(id) + uint2(3, 2)];
+    colors[19] = _Result[GetLocalizedCoords(id) + uint2(3, 3)];
+    colors[20] = _Result[GetLocalizedCoords(id) + uint2(3, 4)];
+    colors[21] = _Result[GetLocalizedCoords(id) + uint2(4, 1)];
+    colors[22] = _Result[GetLocalizedCoords(id) + uint2(4, 2)];
+    colors[23] = _Result[GetLocalizedCoords(id) + uint2(4, 3)];
+    colors[24] = _Result[GetLocalizedCoords(id) + uint2(4, 4)];
+
+    float4 finalColor = (colors[0] + colors[1] + colors[2] + colors[3] + colors[4] + colors[5] + colors[6] + colors[7] + colors[8] +
+        colors[9] + colors[10] + colors[11] + colors[12] + colors[13] + colors[14] + colors[15] + colors[16] + colors[17] + colors[18] +
+        colors[19] + colors[20] + colors[21] + colors[22] + colors[23] + colors[24]) / 25;
+    
+    _Result[id] = finalColor;
+}
+
+
