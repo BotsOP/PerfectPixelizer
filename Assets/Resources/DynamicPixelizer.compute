@@ -1,0 +1,38 @@
+#pragma kernel Pixelize
+#pragma kernel ReadPixelized
+
+RWTexture2D<float4> _Source;
+RWTexture2D<int> _ResultR;
+RWTexture2D<int> _ResultG;
+RWTexture2D<int> _ResultB;
+int _PixelSize;
+
+uint2 GetLocalizedCoords(uint2 id)
+{
+    uint localizedCoordsX = id.x - id.x % _PixelSize;
+    uint localizedCoordsY = id.y - id.y % _PixelSize;
+    return uint2(localizedCoordsX , localizedCoordsY);
+}
+
+//Runs for every pixel
+[numthreads(32,32,1)]
+void Pixelize (uint2 id : SV_DispatchThreadID)
+{
+    float4 color = _Source[id];
+    uint2 localizedCoords = GetLocalizedCoords(id);
+    InterlockedAdd(_ResultR[localizedCoords], (int)(color.r * 1000000));
+    InterlockedAdd(_ResultG[localizedCoords], (int)(color.g * 1000000));
+    InterlockedAdd(_ResultB[localizedCoords], (int)(color.b * 1000000));
+}
+
+[numthreads(32,32,1)]
+void ReadPixelized (uint2 id : SV_DispatchThreadID)
+{
+    float alpha = _Source[id].a;
+    uint2 localizedCoords = GetLocalizedCoords(id);
+    
+    float colorR = (float)_ResultR[localizedCoords] / (float)1000000 / _PixelSize / _PixelSize;
+    float colorG = (float)_ResultG[localizedCoords] / (float)1000000 / _PixelSize / _PixelSize;
+    float colorB = (float)_ResultB[localizedCoords] / (float)1000000 / _PixelSize / _PixelSize;
+    _Source[id] = float4(colorR, colorG, colorB, alpha);
+}
